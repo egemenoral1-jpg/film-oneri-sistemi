@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 import joblib
 import os
+from dotenv import load_dotenv
+import google.generativeai as genai
+
+load_dotenv()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+gemini_model = genai.GenerativeModel("gemini-3.5-flash-lite")
+
+
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'src')
 
@@ -36,6 +44,16 @@ def get_hybrid_recommendations(movie_id, n=5):
     result = result.set_index('movieId').loc[top_movie_ids].reset_index()
     return result
 
+@st.cache_data
+def get_movie_summary(title):
+    try:
+        response = gemini_model.generate_content(
+            f"'{title}' filmi hakkında 2-3 cümlelik kısa bir özet yaz (Türkçe). Sadece özeti yaz, başka bir şey ekleme."
+        )
+        return response.text
+    except Exception:
+        return "Özet alınamadı."
+
 movie_titles = movies['title'].sort_values().tolist()
 selected_title = st.selectbox("Bir film seç:", movie_titles)
 
@@ -49,6 +67,10 @@ if st.button("Önerileri Göster"):
     for _, row in recs.iterrows():
         st.markdown(f"**{row['title']}**")
         st.caption(row['genres'])
+        with st.spinner("Özet hazırlanıyor..."):
+            summary = get_movie_summary(row['title'])
+        st.write(summary)
         st.divider()
+    
 
 st.caption("Hibrit sistem: TF-IDF içerik benzerliği + item-based collaborative filtering (max-birleştirme)")
