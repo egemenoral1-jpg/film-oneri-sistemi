@@ -22,6 +22,14 @@ Kullanıcı-film puan matrisini **mean-centering** ile normalize edip (puanlama 
 - Return of the Jedi, Empire Strikes Back — hem tür hem izleyici kitlesi güçlü
 - Raiders of the Lost Ark, Starship Troopers — izleyici davranışı güçlü
 
+
+
+### 4. AI Destekli Film Özetleri
+MovieLens veri setinde film özeti (plot) bulunmuyor. Bu eksikliği kapatmak için, önerilen her film için **Gemini API** (gemini-3.5-flash-lite) ile anlık kısa özet üretiliyor. Bu özetler modelin eğitim verisine dayalıdır, gerçek zamanlı bir kaynaktan çekilmez — bu yüzden arayüzde bir uyarı notuyla belirtiliyor.
+
+
+
+
 ## 🚀 Kurulum ve Çalıştırma
 
 \`\`\`bash
@@ -30,6 +38,10 @@ cd film-oneri-sistemi
 python -m venv venv
 venv\\Scripts\\activate
 pip install -r requirements.txt
+Gemini API özetleri için, [aistudio.google.com/apikey](https://aistudio.google.com/apikey) adresinden ücretsiz bir API key al, repo kökünde `.env` dosyası oluştur:
+\`\`\`
+GEMINI_API_KEY=senin-api-key-buraya
+\`\`\`
 \`\`\`
 
 Modeli oluşturmak için:
